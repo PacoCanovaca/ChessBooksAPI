@@ -6,7 +6,15 @@ const {
     createBook,
     updateBook,
     deleteBook,
+    getBooksByTitle,
+    getBooksByLanguage,
+    getBooksByAuthor,
 } = require("../controllers/books.controller");
+
+// Rutas de controladores avanzados
+router.get("/filterTitle", getBooksByTitle);
+router.get("/filterLanguage", getBooksByLanguage);
+router.get("/filterAuthor", getBooksByAuthor);
 
 // Rutas de controladores básicos
 router.get("/", getBooks);

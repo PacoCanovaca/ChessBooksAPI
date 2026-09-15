@@ -3,12 +3,12 @@ const Book = require("../models/book.model");
 /* Endpoints a desarrollar:
     - GET /api/books -> para obtener todos los libros registrados
     - GET /api/books/:id -> para obtener un libro por ID
-        - GET /api/books?title=tituloQueSeBusca -> para obtener libros por título (o fragmento del título). Devuelve todos los que cumplan con el fragmento
-        - GET /api/books?language=idiomaParaFiltrar -> para filtrar libros por idioma
-        - GET /api/books?author=autorQueSeBusca -> para filtrar libros por autor
-        - GET /api/books?minYear=añoMínimo&maxYear=añoMáximo -> para filtrar por un rango de año de publicación. Requiere de comando concreto dentro del controller relacionado con MongoDB, está en ChatGPT
-        - GET /api/books?minYear=añoMínimo -> para filtrar libros publicados después del año indicado
-        - GET /api/books?maxYear=añoMáximo -> para filtrar libros publicados antes del año indicado
+    - GET /api/books/filterTitle?title=tituloQueSeBusca -> para obtener libros por título (o fragmento del título). Devuelve todos los que cumplan con el fragmento
+    - GET /api/books/filterLanguage?language=idiomaParaFiltrar -> para filtrar libros por idioma
+        - GET /api/books/filterAuthor?author=autorQueSeBusca -> para filtrar libros por autor
+        - GET /api/books/yearRange?minYear=añoMínimo&maxYear=añoMáximo -> para filtrar por un rango de año de publicación. Requiere de comando concreto dentro del controller relacionado con MongoDB, está en ChatGPT
+        - GET /api/books/minYear?minYear=añoMínimo -> para filtrar libros publicados después del año indicado
+        - GET /api/books/maxYear?maxYear=añoMáximo -> para filtrar libros publicados antes del año indicado
     - POST /api/books -> para crear un registro de libro nuevo
     - PUT /api/books/:id -> para modificar un libro
         - PATCH /api/books/:id -> para modificar un libro añadiendo algún dato (sin tocar lo demás). Sirve sobre todo para añadir elementos en las propiedades que contienen arrays (con PUT habría que añadir el array con los elementos que ya estaban y los nuevos) - Requiere de comando concreto dentro del controller relacionado con MongoDB, está en ChatGPT
@@ -77,10 +77,64 @@ const deleteBook = async (req, res) => {
     }
 };
 
+// GET /api/books/filterTitle?title=tituloQueSeBusca
+const getBooksByTitle = async (req, res) => {
+    try {
+        const { title } = req.query;
+        if (!title) {
+            return res.status(400).json({ error: "You must include ?title= followed by the title you are looking for" });
+        }
+        const books = await Book.find({ title: new RegExp(title, "i")});
+        if (!books.length) {
+            return res.status(200).json({ message: "No books found by that title" });
+        }
+        res.status(200).json(books);
+    } catch (err) {
+        res.status(500).json({ error: "Not able to get books from the Server" });
+    }
+};
+
+// GET /api/books/filterLanguage?language=idiomaParaFiltrar
+const getBooksByLanguage = async (req, res) => {
+    try {
+        const { language } = req.query;
+        if (!language) {
+            return res.status(400).json({ error: "You must include ?language= followed by the language you are looking for" });
+        }
+        const books = await Book.find({ language: new RegExp(language, "i")});
+        if (!books.length) {
+            return res.status(200).json({ message: "No books found in that language" });
+        }
+        res.status(200).json(books);
+    } catch (err) {
+        res.status(500).json({ error: "Not able to get books from the Server" });
+    }
+}
+
+// GET /api/books/filterAuthor?author=autorQueSeBusca
+const getBooksByAuthor = async (req, res) => {
+    try {
+        const { author } = req.query;
+        if (!author) {
+            return res.status(400).json({ error: "You must include ?author= followed by the author you are looking for" });
+        }
+        const books = await Book.find({ authors: new RegExp(author, "i")});
+        if (!books.length) {
+            return res.status(200).json({ message: "No books written by that author in the DB" });
+        }
+        res.status(200).json(books);
+    } catch (err) {
+        res.status(500).json({ error: "Not able to get books from the Server" });
+    }
+}
+
 module.exports = {
     getBooks,
     getBookById,
     createBook,
     updateBook,
-    deleteBook
+    deleteBook,
+    getBooksByTitle,
+    getBooksByLanguage,
+    getBooksByAuthor
 }
