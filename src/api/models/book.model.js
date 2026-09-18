@@ -32,6 +32,12 @@ const bookSchema = new Schema(
                 "Norwegian"
             ] 
         },
+        authors: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "Author"
+            }
+        ],
         purchase_links: { type: [String] },
         book_images: { type: [String] },
         publisher: { type: String, required: true, trim: true},

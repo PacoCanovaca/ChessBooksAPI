@@ -7,13 +7,7 @@ const authorSchema = new Schema(
         nationality: { type: String, trim: true },
         birthYear: { type: Number },
         passingYear: { type: Number },
-        title: { type: String, enum: ["GM", "IM", "FM", "CM", "NM"] },
-        books: [
-            {
-                type: mongoose.Types.ObjectId,
-                ref: "Book"
-            }
-        ]
+        title: { type: String, enum: ["GM", "IM", "FM", "CM", "NM"] }
     },
     {
         timestamps: true,

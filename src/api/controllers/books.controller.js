@@ -16,17 +16,17 @@ const Book = require("../models/book.model");
 // GET /api/books
 const getBooks = async (req, res) => {
     try {
-        const books = await Book.find();
+        const books = await Book.find().populate("authors");
         res.status(200).json(books);
     } catch (err) {
-        res.status(500).json({ error: "Not able to get books from the server" });
+        res.status(500).json({ error: "Not able to get books from the server", details: err.message });
     }
 };
 
 // GET /api/books/:id
 const getBookById = async (req, res) => {
     try {
-        const book = await Book.findById(req.params.id);
+        const book = await Book.findById(req.params.id).populate("authors");
         if (!book) {
             return res.status(404).json({ error: "Book not found" });
         }
@@ -82,7 +82,7 @@ const getBooksByTitle = async (req, res) => {
         if (!title) {
             return res.status(400).json({ error: "You must include ?title= followed by the title you are looking for" });
         }
-        const books = await Book.find({ title: new RegExp(title, "i")});
+        const books = await Book.find({ title: new RegExp(title, "i") }).populate("authors");
         if (!books.length) {
             return res.status(200).json({ message: "No books found by that title" });
         }
@@ -99,7 +99,7 @@ const getBooksByLanguage = async (req, res) => {
         if (!language) {
             return res.status(400).json({ error: "You must include ?language= followed by the language you are looking for" });
         }
-        const books = await Book.find({ language: new RegExp(language, "i")});
+        const books = await Book.find({ language: new RegExp(language, "i") }).populate("authors");
         if (!books.length) {
             return res.status(200).json({ message: "No books found in that language" });
         }
@@ -109,14 +109,14 @@ const getBooksByLanguage = async (req, res) => {
     }
 };
 
-// GET /api/books/filterAuthor?author=autorQueSeBusca
+// GET /api/books/filterAuthor?author=idAutorQueSeBusca
 const getBooksByAuthor = async (req, res) => {
     try {
         const { author } = req.query;
         if (!author) {
-            return res.status(400).json({ error: "You must include ?author= followed by the author you are looking for" });
+            return res.status(400).json({ error: "You must include ?author= followed by the id of the author you are looking for" });
         }
-        const books = await Book.find({ authors: new RegExp(author, "i") });
+        const books = await Book.find({ authors: new RegExp(author, "i") }).populate("authors");
         if (!books.length) {
             return res.status(200).json({ message: "No books written by that author in the DB" });
         }
@@ -137,7 +137,7 @@ const getBooksByYearRange = async (req, res) => {
         if (Number.isNaN(parsedMin) || Number.isNaN(parsedMax)) {
             return res.status(400).json({ error: "minYear and maxYear must be valid numbers" });
         }
-        const books = await Book.find({ year: { $gte: parsedMin, $lte: parsedMax }  });
+        const books = await Book.find({ year: { $gte: parsedMin, $lte: parsedMax }  }).populate("authors");
         if(!books.length) {
             return res.status(200).json({ message: "No books published in that year range" });
         }
@@ -156,7 +156,7 @@ const addAuthorToBook = async (req, res) => {
         if (!book) {
             return res.status(404).json({ error: "Book not found" });
         }
-        if (book.authors.some(author => author.toLowerCase() === addAuthor.toLowerCase())) {
+        if (book.authors.some(author => author === addAuthor)) {
             return res.status(400).json({ error: "The author included already exists" });
         }
         const updatedBook = await Book.findByIdAndUpdate(
