@@ -30,14 +30,7 @@ const bookSchema = new Schema(
                 "Ukrainian",
                 "Danish",
                 "Norwegian"
-            ] },
-        authors: { 
-            type: [String], 
-            required: true,
-            validate: {
-                validator: (authors) => authors.length > 0,
-                message: "A book must have at least one author"
-            }
+            ] 
         },
         purchase_links: { type: [String] },
         book_images: { type: [String] },

@@ -9,7 +9,7 @@ const Book = require("../models/book.model");
     - GET /api/books/yearRange?minYear=añoMínimo&maxYear=añoMáximo -> para filtrar por un rango de año de publicación. Requiere de comando concreto dentro del controller relacionado con MongoDB, está en ChatGPT
     - POST /api/books -> para crear un registro de libro nuevo
     - PUT /api/books/:id -> para modificar un libro
-        - PATCH /api/books/:id -> para modificar un libro añadiendo algún dato (sin tocar lo demás). Sirve sobre todo para añadir elementos en las propiedades que contienen arrays (con PUT habría que añadir el array con los elementos que ya estaban y los nuevos) - Requiere de comando concreto dentro del controller relacionado con MongoDB, está en ChatGPT
+    - PATCH /api/books/:id -> para modificar un libro añadiendo algún dato (sin tocar lo demás). Sirve sobre todo para añadir elementos en las propiedades que contienen arrays (con PUT habría que añadir el array con los elementos que ya estaban y los nuevos) - Requiere de comando concreto dentro del controller relacionado con MongoDB, está en ChatGPT
     - DELETE /api/books/:id -> para eliminar un libro
 */
 
@@ -116,7 +116,7 @@ const getBooksByAuthor = async (req, res) => {
         if (!author) {
             return res.status(400).json({ error: "You must include ?author= followed by the author you are looking for" });
         }
-        const books = await Book.find({ authors: new RegExp(author, "i")});
+        const books = await Book.find({ authors: new RegExp(author, "i") });
         if (!books.length) {
             return res.status(200).json({ message: "No books written by that author in the DB" });
         }
