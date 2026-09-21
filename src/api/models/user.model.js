@@ -10,7 +10,7 @@ const userSchema = new Schema(
             type: String,
             trim: true,
             required: true,
-            minLength: [8, "La contraseña debe tener al menos 8 caracteres"]
+            minLength: [8, "Password must have at least 8 characters"]
         },
         email: { type: String, trim: true, required: true, unique: true },
         role: { 
@@ -28,7 +28,7 @@ const userSchema = new Schema(
 
 userSchema.pre("save", function (next) {
     this.password = bcrypt.hashSync(this.password, 10);
-    next();
+    next;
 });
 
 const User = mongoose.model("User", userSchema);

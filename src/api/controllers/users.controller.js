@@ -1,10 +1,12 @@
 const User = require("../models/user.model");
+const bcrypt = require("bcrypt");
+const { generateToken } = require("../../utils/token.js");
 
 /* Endpoints a desarrollar:
     - POST /api/users/register -> registrar un nuevo usuario
     - POST /api/users/login -> hacer un login
-    - PUT /api/users/update/:id -> actualizar información de un usuario (para userName, imagen de perfil y contraseña)
-    - DELETE /api/users/delete/:id -> eliminar un usuario
+        - PUT /api/users/update/:id -> actualizar información de un usuario (para userName, imagen de perfil y contraseña)
+        - DELETE /api/users/delete/:id -> eliminar un usuario
 */
 
 // POST /api/users/register
@@ -23,6 +25,26 @@ const registerUser = async(req, res) => {
     }
 };
 
+// POST /api/users/login
+const loginUser = async(req, res) => {
+    try {
+        const loginInfo = req.body;
+        const user = await User.findOne({ email: loginInfo.email });
+        if (!user) {
+            return res.status(400).json({ error: "Email not registered" });
+        }
+        const validPassword = bcrypt.compareSync(loginInfo.password, user.password);
+        if (!validPassword) {
+            return res.status(400).json({ error: "Incorrect Password" });
+        }
+        const token = generateToken(user._id, user.email);
+        return res.status(200).json(token);
+    } catch (err) {
+        res.status(400).json({ error: "Login can not be completed", details: err.message });
+    }
+}
+
 module.exports = {
-    registerUser
+    registerUser,
+    loginUser
 }
