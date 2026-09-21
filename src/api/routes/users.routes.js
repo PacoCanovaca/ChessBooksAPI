@@ -12,5 +12,8 @@ router.post("/register", registerUser);
 router.post("/login", loginUser);
 router.put("/update/:id", updateUserInfo);
 router.delete("/delete/:id", isAuth(["admin"]), deleteUser);
+// router.get("/", isAuth(["admin"]), getUsers);
+// router.get("/:id", isAuth(["admin"]), getUserInfo);
+// router.get("/getFavoriteBooks/:id", getFavoriteBooks);
 
 module.exports = router;

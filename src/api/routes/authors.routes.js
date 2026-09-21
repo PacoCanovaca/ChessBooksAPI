@@ -5,8 +5,8 @@ const router = express.Router();
 router.get("/name", getAuthorsByName);
 router.get("/", getAuthors);
 router.get("/:id", getAuthorById);
-router.post("/", createAuthor);
-router.put("/:id", updateAuthor);
-router.delete("/:id", deleteAuthor);
+router.post("/", isAuth(["admin"]), createAuthor);
+router.put("/:id", isAuth(["admin"]), updateAuthor);
+router.delete("/:id", isAuth(["admin"]), deleteAuthor);
 
 module.exports = router;

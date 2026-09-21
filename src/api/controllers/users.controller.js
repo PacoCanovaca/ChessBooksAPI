@@ -5,8 +5,11 @@ const { generateToken } = require("../../utils/token.js");
 /* Endpoints a desarrollar:
     - POST /api/users/register -> registrar un nuevo usuario
     - POST /api/users/login -> hacer un login
-        - PUT /api/users/update/:id -> actualizar información de un usuario (para userName, imagen de perfil y contraseña)
-        - DELETE /api/users/delete/:id -> eliminar un usuario
+    - PUT /api/users/update/:id -> actualizar información de un usuario (para userName, imagen de perfil, contraseña o libros favoritos)
+    - DELETE /api/users/delete/:id -> eliminar un usuario
+        - GET /api/users -> obtener todos los usuarios
+        - GET /api/users/:id -> obtener usuario por id
+        - GET /api/users/getFavoriteBooks/:id -> obtener libros favoritos de un usuario
 */
 
 // POST /api/users/register

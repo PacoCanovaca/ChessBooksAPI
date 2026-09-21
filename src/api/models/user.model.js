@@ -18,7 +18,11 @@ const userSchema = new Schema(
             trim: true, 
             required: true, 
             enum: ["admin", "user"]
-        }
+        },
+        favorites: [{
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Book"
+        }]
     },
     {
         timestamps: true,
