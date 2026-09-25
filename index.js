@@ -4,9 +4,11 @@ const { connectDB } = require("./src/config/db");
 const booksRouter = require("./src/api/routes/books.routes");
 const authorsRouter = require("./src/api/routes/authors.routes");
 const usersRouter = require("./src/api/routes/users.routes");
+const { connectCloudinary } = require("./src/config/cloudinary");
 
 const app = express();
 connectDB();
+connectCloudinary();
 
 app.use(express.json());
 

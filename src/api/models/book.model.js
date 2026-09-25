@@ -39,7 +39,10 @@ const bookSchema = new Schema(
             }
         ],
         purchase_links: { type: [String] },
-        book_images: { type: [String] },
+        image: { 
+            imgUrl: { type: String, trim: true },
+            imgId: { type: String, trim: true }, 
+        },
         publisher: { type: String, required: true, trim: true},
     },
     {

@@ -49,7 +49,14 @@ const loginUser = async (req, res) => {
 // PUT /api/users/update/:id
 const updateUserInfo = async (req, res) => {
     try { 
-        const updated = await User.findByIdAndUpdate(req.params.id, req.body, {
+        const updateData = { ...req.body };
+        if (req.file) {
+            updateData.image = {
+                imgUrl: req.file.path,
+                imgId: req.file.filename
+            }
+        }
+        const updated = await User.findByIdAndUpdate(req.params.id, updateData, {
             new: true,
             runValidators: true,
         });

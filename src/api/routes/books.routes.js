@@ -13,6 +13,7 @@ const {
     addAuthorToBook,
 } = require("../controllers/books.controller");
 const isAuth = require("../../middlewares/auth.middleware");
+const { uploadBook }= require("../../middlewares/file.middleware");
 
 // Rutas de controladores avanzados
 router.get("/filterTitle", getBooksByTitle);
@@ -24,8 +25,8 @@ router.patch("/addAuthor/:id", isAuth(["admin"]), addAuthorToBook);
 // Rutas de controladores básicos
 router.get("/", getBooks);
 router.get("/:id", getBookById);
-router.post("/", isAuth(["admin"]), createBook);
-router.put("/:id", isAuth(["admin"]), updateBook);
+router.post("/", isAuth(["admin"]), uploadBook.single("img"), createBook);
+router.put("/:id", isAuth(["admin"]), uploadBook.single("img"), updateBook);
 router.delete("/:id", isAuth(["admin"]), deleteBook);
 
 module.exports = router;

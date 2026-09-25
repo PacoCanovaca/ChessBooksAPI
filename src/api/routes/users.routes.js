@@ -9,10 +9,11 @@ const {
     getUserById
 } = require("../controllers/users.controller");
 const isAuth = require("../../middlewares/auth.middleware");
+const { uploadUser } = require("../../middlewares/file.middleware");
 
 router.post("/register", registerUser);
 router.post("/login", loginUser);
-router.put("/update/:id", updateUserInfo);
+router.put("/update/:id", uploadUser.single("img"), updateUserInfo);
 router.delete("/delete/:id", isAuth(["admin"]), deleteUser);
 router.get("/", isAuth(["admin"]), getUsers);
 router.get("/:id", isAuth(["admin"]), getUserById);

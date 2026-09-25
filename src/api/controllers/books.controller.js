@@ -39,8 +39,13 @@ const getBookById = async (req, res) => {
 // POST /api/books
 const createBook = async (req, res) => {
     try {
-        const book = await Book.create(req.body);
-        res.status(201).json({ message: "Book created successfully", book: book });
+        const book = new Book(req.body);
+        if (req.file) {
+            book.image.imgUrl = req.file.path;
+            book.image.imgId = req.file.filename;
+        }
+        const bookCreated = await book.save();
+        res.status(201).json({ message: "Book created successfully", book: bookCreated });
     } catch (err) {
         res.status(400).json({ error: "Book can not be created", details: err.message });
     }
@@ -49,7 +54,14 @@ const createBook = async (req, res) => {
 // PUT /api/books/:id
 const updateBook = async (req, res) => {
     try {
-        const updated = await Book.findByIdAndUpdate(req.params.id, req.body, {
+        const updateData = { ...req.body };
+        if (req.file) {
+            updateData.image = {
+                imgUrl: req.file.path,
+                imgId: req.file.filename
+            }
+        }
+        const updated = await Book.findByIdAndUpdate(req.params.id, updateData, {
             new: true,
             runValidators: true,
         });
