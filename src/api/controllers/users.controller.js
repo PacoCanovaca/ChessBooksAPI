@@ -7,9 +7,8 @@ const { generateToken } = require("../../utils/token.js");
     - POST /api/users/login -> hacer un login
     - PUT /api/users/update/:id -> actualizar información de un usuario (para userName, imagen de perfil, contraseña o libros favoritos)
     - DELETE /api/users/delete/:id -> eliminar un usuario
-        - GET /api/users -> obtener todos los usuarios
-        - GET /api/users/:id -> obtener usuario por id
-        - GET /api/users/getFavoriteBooks/:id -> obtener libros favoritos de un usuario
+    - GET /api/users -> obtener todos los usuarios
+    - GET /api/users/:id -> obtener usuario por id
 */
 
 // POST /api/users/register
@@ -74,11 +73,35 @@ const deleteUser = async (req, res) => {
     } catch (err) {
         res.status(400).json({ error: "User can not be deleted", details: err.message })
     }
-}
+};
+
+// GET /api/users
+const getUsers = async (req, res) => {
+    try {
+        const users = await User.find().populate("favorites");
+        res.status(200).json(users);
+    } catch (err) {
+        res.status(500).json({ error: "Not able to get users", details: err.message });
+    }
+};
+
+// GET /api/users/:id
+const getUserById = async (req, res) => {
+    try {
+        const user = await User.findById().populate("favorites");
+        if (!user) {
+            res.status(404).json({ error: "User not found" });
+        }
+    } catch (err) {
+        res.status(400).json({ error: "Incorrect ID or server issues", details: err.message });
+    }
+};
 
 module.exports = {
     registerUser,
     loginUser,
     updateUserInfo,
-    deleteUser
+    deleteUser,
+    getUsers,
+    getUserById
 };
