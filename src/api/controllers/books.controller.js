@@ -1,3 +1,4 @@
+const { deleteImgCloudinary } = require("../../utils/cloudinary");
 const Book = require("../models/book.model");
 
 /* Endpoints a desarrollar:
@@ -47,6 +48,7 @@ const createBook = async (req, res) => {
         const bookCreated = await book.save();
         res.status(201).json({ message: "Book created successfully", book: bookCreated });
     } catch (err) {
+        if (req.file.filename) await deleteImgCloudinary(req.file.filename);
         res.status(400).json({ error: "Book can not be created", details: err.message });
     }
 };
@@ -70,6 +72,7 @@ const updateBook = async (req, res) => {
         }
         res.status(200).json({ message: "Book updated successfully", updatedBook: updated });
     } catch (err) {
+        if (req.file.filename) await deleteImgCloudinary(req.file.filename);
         res.status(400).json({ error: "Book can not be updated", details: err.message });
     }
 };
@@ -81,6 +84,7 @@ const deleteBook = async (req, res) => {
         if (!deleted) {
             return res.status(404).json({ error: "Book not found" });
         }
+        deleteImgCloudinary(deleted.image.imgId);
         res.status(200).json({ message: "Book deleted successfully", deletedBook: deleted })
     } catch (err) {
         res.status(400).json({ error: "Book can not be deleted", details: err.message })
