@@ -66,7 +66,7 @@ const updateUserInfo = async (req, res) => {
         }
         res.status(200).json({ message: "User updated successfully", updatedUser: updated })
     } catch (err) {
-        if (req.file.filename) await deleteImgCloudinary(req.file.filename);
+        if (req.file) await deleteImgCloudinary(req.file.filename);
         res.status(400).json({ error: "User can not be updated", details: err.message });
     }
 };

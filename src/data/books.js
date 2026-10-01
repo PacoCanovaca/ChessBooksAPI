@@ -170,8 +170,7 @@ const booksSeed = [
         year: 1940,
         language: "Spanish",
         authors: [authorIds.grau],
-        purchase_links: ["https://ejemplo.com/comprar/tratado-grau"],
-        book_images: ["https://ejemplo.com/img/tratado-grau.jpg"],
+        purchase_links: [],
         publisher: "Ediciones Sopena"
     },
     {
@@ -180,8 +179,7 @@ const booksSeed = [
         year: 1921,
         language: "Spanish",
         authors: [authorIds.capablanca],
-        purchase_links: ["https://ejemplo.com/comprar/fundamentos-capablanca"],
-        book_images: ["https://ejemplo.com/img/fundamentos-capablanca.jpg"],
+        purchase_links: [],
         publisher: "La Casa del Ajedrez"
     },
     {
@@ -190,8 +188,7 @@ const booksSeed = [
         year: 2003,
         language: "Spanish",
         authors: [authorIds.kasparov],
-        purchase_links: ["https://ejemplo.com/comprar/predecesores-kasparov"],
-        book_images: ["https://ejemplo.com/img/predecesores.jpg"],
+        purchase_links: [],
         publisher: "Ediciones Merán"
     },
     {
@@ -200,8 +197,7 @@ const booksSeed = [
         year: 1957,
         language: "Spanish",
         authors: [authorIds.chernev],
-        purchase_links: ["https://ejemplo.com/comprar/ajedrez-logico"],
-        book_images: ["https://ejemplo.com/img/ajedrez-logico.jpg"],
+        purchase_links: [],
         publisher: "Ediciones Tutor"
     },
     {
@@ -211,7 +207,6 @@ const booksSeed = [
         language: "Spanish",
         authors: [authorIds.kotov],
         purchase_links: [],
-        book_images: [],
         publisher: "Ediciones Tutor"
     },
 
@@ -222,8 +217,7 @@ const booksSeed = [
         year: 1925,
         language: "English",
         authors: [authorIds.nimzowitsch],
-        purchase_links: ["https://example.com/buy/my-system"],
-        book_images: ["https://example.com/img/my-system.jpg"],
+        purchase_links: [],
         publisher: "Quality Chess"
     },
     {
@@ -232,8 +226,7 @@ const booksSeed = [
         year: 1953,
         language: "English",
         authors: [authorIds.bronstein],
-        purchase_links: ["https://example.com/buy/zurich-1953"],
-        book_images: [],
+        purchase_links: [],
         publisher: "Dover Publications"
     },
     {
@@ -242,8 +235,7 @@ const booksSeed = [
         year: 1966,
         language: "English",
         authors: [authorIds.fischer, authorIds.margulies, authorIds.mosenfelder],
-        purchase_links: ["https://example.com/buy/fischer-teaches"],
-        book_images: ["https://example.com/img/fischer.jpg"],
+        purchase_links: [],
         publisher: "Bantam Books"
     },
     {
@@ -252,8 +244,7 @@ const booksSeed = [
         year: 1993,
         language: "English",
         authors: [authorIds.silman],
-        purchase_links: ["https://example.com/buy/reassess"],
-        book_images: ["https://example.com/img/reassess.jpg"],
+        purchase_links: [],
         publisher: "Siles Press"
     },
     {
@@ -263,7 +254,6 @@ const booksSeed = [
         language: "English",
         authors: [authorIds.dvoretsky],
         purchase_links: [],
-        book_images: ["https://example.com/img/dvoretsky.jpg"],
         publisher: "Russell Enterprises"
     },
 
@@ -274,8 +264,7 @@ const booksSeed = [
         year: 1749,
         language: "French",
         authors: [authorIds.philidor],
-        purchase_links: ["https://exemple.fr/acheter/analyse-philidor"],
-        book_images: ["https://exemple.fr/img/philidor.jpg"],
+        purchase_links: [],
         publisher: "Jean-Toussaint Trattner"
     },
     {
@@ -284,8 +273,7 @@ const booksSeed = [
         year: 1947,
         language: "French",
         authors: [authorIds.renaud, authorIds.kahn],
-        purchase_links: ["https://exemple.fr/acheter/art-de-faire-mat"],
-        book_images: [],
+        purchase_links: [],
         publisher: "Payot"
     },
     {
@@ -295,7 +283,6 @@ const booksSeed = [
         language: "French",
         authors: [authorIds.tartakower],
         purchase_links: [],
-        book_images: ["https://exemple.fr/img/tartakower.jpg"],
         publisher: "Stock"
     },
     {
@@ -304,8 +291,7 @@ const booksSeed = [
         year: 1993,
         language: "French",
         authors: [authorIds.giffard, authorIds.bienabe],
-        purchase_links: ["https://exemple.fr/acheter/guide-des-echecs"],
-        book_images: ["https://exemple.fr/img/guide-echecs.jpg"],
+        purchase_links: [],
         publisher: "Robert Laffont"
     },
     {
@@ -314,8 +300,7 @@ const booksSeed = [
         year: 1939,
         language: "French",
         authors: [authorIds.leLionnais],
-        purchase_links: ["https://exemple.fr/acheter/prix-beaute"],
-        book_images: [],
+        purchase_links: [],
         publisher: "Payot"
     }
 ];

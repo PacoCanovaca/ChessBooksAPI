@@ -48,7 +48,7 @@ const createBook = async (req, res) => {
         const bookCreated = await book.save();
         res.status(201).json({ message: "Book created successfully", book: bookCreated });
     } catch (err) {
-        if (req.file.filename) await deleteImgCloudinary(req.file.filename);
+        if (req.file) await deleteImgCloudinary(req.file.filename);
         res.status(400).json({ error: "Book can not be created", details: err.message });
     }
 };
@@ -72,7 +72,7 @@ const updateBook = async (req, res) => {
         }
         res.status(200).json({ message: "Book updated successfully", updatedBook: updated });
     } catch (err) {
-        if (req.file.filename) await deleteImgCloudinary(req.file.filename);
+        if (req.file) await deleteImgCloudinary(req.file.filename);
         res.status(400).json({ error: "Book can not be updated", details: err.message });
     }
 };
@@ -189,6 +189,32 @@ const addAuthorToBook = async (req, res) => {
     }
 };
 
+// PATCH /api/books/addPurchaseLink/:id
+const addPurchaseLinkToBook = async (req, res) => {
+    try {
+        const { addPurchaseLink } = req.body;
+        const id = req.params.id;
+        const book = await Book.findById(id);
+        if (!book) {
+            return res.status(404).json({ error: "Book not found" });
+        }
+        if (book.purchase_links.some(purchaseLink => purchaseLink === addPurchaseLink)) {
+            return res.status(400).json({ error: "The purchase link included already exists" });
+        }
+        const updatedBook = await Book.findByIdAndUpdate(
+            id, 
+            { $push: { purchase_links: addPurchaseLink } }, 
+            { 
+                new: true,
+                runValidators: true
+            }
+        );
+        res.status(200).json({ message: "Book updated successfully", updatedBook: updatedBook});
+    } catch (err) {
+        res.status(400).json({ error: "Book can not be updated", details: err.message });
+    }
+};
+
 module.exports = {
     getBooks,
     getBookById,
@@ -199,5 +225,6 @@ module.exports = {
     getBooksByLanguage,
     getBooksByAuthor,
     getBooksByYearRange,
-    addAuthorToBook
+    addAuthorToBook,
+    addPurchaseLinkToBook
 };

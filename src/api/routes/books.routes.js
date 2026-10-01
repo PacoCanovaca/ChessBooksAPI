@@ -11,6 +11,7 @@ const {
     getBooksByAuthor,
     getBooksByYearRange,
     addAuthorToBook,
+    addPurchaseLinkToBook,
 } = require("../controllers/books.controller");
 const isAuth = require("../../middlewares/auth.middleware");
 const { uploadBook }= require("../../middlewares/file.middleware");
@@ -21,6 +22,7 @@ router.get("/filterLanguage", getBooksByLanguage);
 router.get("/filterAuthor", getBooksByAuthor);
 router.get("/yearRange", getBooksByYearRange);
 router.patch("/addAuthor/:id", isAuth(["admin"]), addAuthorToBook);
+router.patch("/addPurchaseLink/:id", isAuth(["admin"]), addPurchaseLinkToBook);
 
 // Rutas de controladores básicos
 router.get("/", getBooks);
