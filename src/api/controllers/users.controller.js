@@ -98,10 +98,11 @@ const getUsers = async (req, res) => {
 // GET /api/users/:id
 const getUserById = async (req, res) => {
     try {
-        const user = await User.findById().populate("favorites");
+        const user = await User.findById(req.params.id).populate("favorites");
         if (!user) {
-            res.status(404).json({ error: "User not found" });
+            return res.status(404).json({ error: "User not found" });
         }
+        res.status(200).json(user);
     } catch (err) {
         res.status(400).json({ error: "Incorrect ID or server issues", details: err.message });
     }

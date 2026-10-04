@@ -1,5 +1,6 @@
 const express = require("express");
 const { getAuthorsByName, getAuthors, getAuthorById, createAuthor, updateAuthor, deleteAuthor } = require("../controllers/authors.controller");
+const isAuth = require("../../middlewares/auth.middleware");
 const router = express.Router();
 
 router.get("/name", getAuthorsByName);

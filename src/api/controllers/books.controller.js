@@ -66,7 +66,7 @@ const updateBook = async (req, res) => {
         const updated = await Book.findByIdAndUpdate(req.params.id, updateData, {
             new: true,
             runValidators: true,
-        });
+        }).populate("authors");
         if (!updated) {
             return res.status(404).json({ error: "Book not found" });
         }
@@ -132,11 +132,16 @@ const getBooksByAuthor = async (req, res) => {
         if (!author) {
             return res.status(400).json({ error: "You must include ?author= followed by the id of the author you are looking for" });
         }
-        const books = await Book.find({ authors: new RegExp(author, "i") }).populate("authors");
-        if (!books.length) {
+        const books = await Book.find().populate("authors");
+        const filteredBooks = books.filter(book => 
+            book.authors.some(indAuthor => 
+                indAuthor.fullName.toLowerCase().includes(author.toLowerCase())
+            )
+        );
+        if (!filteredBooks.length) {
             return res.status(200).json({ message: "No books written by that author in the DB" });
         }
-        res.status(200).json(books);
+        res.status(200).json(filteredBooks);
     } catch (err) {
         res.status(500).json({ error: "Not able to get books from the Server", details: err.message });
     }
@@ -182,7 +187,7 @@ const addAuthorToBook = async (req, res) => {
                 new: true,
                 runValidators: true
             }
-        );
+        ).populate("authors");
         res.status(200).json({ message: "Book updated successfully", updatedBook: updatedBook});
     } catch (err) {
         res.status(400).json({ error: "Book can not be updated", details: err.message });
@@ -208,7 +213,7 @@ const addPurchaseLinkToBook = async (req, res) => {
                 new: true,
                 runValidators: true
             }
-        );
+        ).populate("authors");
         res.status(200).json({ message: "Book updated successfully", updatedBook: updatedBook});
     } catch (err) {
         res.status(400).json({ error: "Book can not be updated", details: err.message });
