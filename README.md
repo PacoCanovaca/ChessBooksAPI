@@ -1,639 +1,226 @@
-# ♟️ ChessBooksAPI
+# ChessBooksAPI
 
-REST API for managing a catalogue of chess books, authors and users.
+## 📖 ¿Qué es este proyecto?
 
-ChessBooksAPI is a Node.js backend built with **Express** and **MongoDB/Mongoose**. It provides CRUD operations for books and authors, search and filtering endpoints, JWT-based authentication with role-based authorization, and image uploads through **Cloudinary**.
+**ChessBooksAPI** es una API REST para gestionar un catálogo de literatura ajedrecística. Permite consultar libros y autores, buscar publicaciones mediante distintos criterios y administrar los datos del catálogo. También incorpora registro e inicio de sesión de usuarios, gestión de perfiles y una lista de libros favoritos.
 
-The project is designed as a backend-focused application for practising REST API design, MongoDB data modelling, authentication, file handling and resource relationships.
+El proyecto centraliza la información de los libros —como título, año de publicación, idioma, editorial, autores e imagen— y permite relacionar cada publicación con uno o varios autores.
 
----
+## 🛠️ Stack Tecnológico
 
-## 📌 Features
+- **Lenguaje:** JavaScript (Node.js).
+- **Entorno de ejecución:** Node.js.
+- **Backend:** Express 5.
+- **Base de datos:** MongoDB.
+- **ODM:** Mongoose.
+- **Autenticación:** JSON Web Tokens (JWT).
+- **Cifrado de contraseñas:** bcrypt.
+- **Gestión de imágenes:** Cloudinary, Multer y Multer Storage Cloudinary.
+- **Variables de entorno:** dotenv.
+- **Desarrollo:** Nodemon.
 
-### Books
+## 🚀 Instalación y Puesta en Marcha
 
-- Create, read, update and delete chess books.
-- Search books by title fragment.
-- Filter books by language.
-- Filter books by author.
-- Filter books by a publication-year range.
-- Associate one or more authors with a book.
-- Store external purchase links.
-- Upload and replace book cover images through Cloudinary.
-- Populate referenced author documents when retrieving books.
+### Requisitos previos
 
-### Authors
+- Node.js y npm.
+- Una base de datos MongoDB local o un clúster de MongoDB Atlas.
+- Una cuenta de Cloudinary para utilizar la subida y gestión de imágenes.
 
-- Create, read, update and delete authors.
-- Search authors by name fragment.
-- Store biographical information and chess titles.
-
-### Users & authentication
-
-- User registration.
-- User login with email and password.
-- Password hashing with `bcrypt`.
-- JWT access tokens with a one-day expiration.
-- Role-based authorization using `admin` and `user` roles.
-- User profile image uploads through Cloudinary.
-- Favourite books stored as MongoDB references.
-
-### Data initialization
-
-- Includes a seed script with sample chess authors and books.
-- The seed script resets the existing `books` and `authors` collections before inserting the seed data.
-
----
-
-## 🛠️ Tech Stack
-
-| Technology | Purpose |
-| --- | --- |
-| **Node.js** | JavaScript runtime |
-| **Express 5** | REST API and routing |
-| **MongoDB** | NoSQL database |
-| **Mongoose** | ODM and schema validation |
-| **JSON Web Token (JWT)** | Authentication |
-| **bcrypt** | Password hashing |
-| **Cloudinary** | Image storage and management |
-| **Multer** | Multipart/form-data file uploads |
-| **dotenv** | Environment variable management |
-| **Nodemon** | Development server reloads |
-
----
-
-## 🏗️ Architecture
-
-The application follows a simple layered backend structure:
-
-```text
-HTTP Request
-    │
-    ▼
-Express Router
-    │
-    ├── Authentication middleware (protected routes)
-    │
-    ▼
-Controller
-    │
-    ▼
-Mongoose Model
-    │
-    ▼
-MongoDB
-```
-
-Image uploads follow a similar flow through Multer and Cloudinary:
-
-```text
-Client
-  │
-  │ multipart/form-data
-  ▼
-Multer / Cloudinary Storage
-  │
-  ▼
-Cloudinary
-  │
-  ▼
-Image URL + public ID stored in MongoDB
-```
-
----
-
-## 📁 Project Structure
-
-```text
-ChessBooksAPI/
-│
-├── index.js                         # Application entry point
-├── package.json                     # Dependencies and npm scripts
-├── package-lock.json
-├── .gitignore
-├── README.md
-│
-└── src/
-    ├── api/
-    │   ├── controllers/
-    │   │   ├── books.controller.js
-    │   │   ├── authors.controller.js
-    │   │   └── users.controller.js
-    │   │
-    │   ├── models/
-    │   │   ├── book.model.js
-    │   │   ├── author.model.js
-    │   │   └── user.model.js
-    │   │
-    │   └── routes/
-    │       ├── books.routes.js
-    │       ├── authors.routes.js
-    │       └── users.routes.js
-    │
-    ├── config/
-    │   ├── db.js                    # MongoDB connection
-    │   └── cloudinary.js             # Cloudinary configuration
-    │
-    ├── data/
-    │   └── books.js                 # Seed data
-    │
-    ├── middlewares/
-    │   ├── auth.middleware.js       # JWT verification + role authorization
-    │   └── file.middleware.js       # Multer + Cloudinary storage
-    │
-    └── utils/
-        ├── cloudinary.js            # Cloudinary image deletion helper
-        ├── token.js                 # JWT generation and verification
-        └── seeds/
-            └── books.seed.js        # Database seed/reset script
-```
-
----
-
-## 🗄️ Data Model
-
-### Book
-
-A book contains the following main fields:
-
-| Field | Type | Required | Description |
-| --- | --- | ---: | --- |
-| `title` | String | ✅ | Book title |
-| `synopsis` | String | ❌ | Short description |
-| `year` | Number | ✅ | Publication year (`1400`–`2100`) |
-| `language` | String | ✅ | Supported book language |
-| `authors` | `[ObjectId]` | ❌ | References to `Author` documents |
-| `purchase_links` | `[String]` | ❌ | External purchase URLs |
-| `image.imgUrl` | String | ❌ | Cloudinary image URL |
-| `image.imgId` | String | ❌ | Cloudinary public ID |
-| `publisher` | String | ✅ | Publisher |
-| `createdAt` | Date | — | Automatically generated timestamp |
-| `updatedAt` | Date | — | Automatically generated timestamp |
-
-Supported book languages are currently defined as an enum in the Mongoose schema and include English, Chinese, Spanish, German, French, Japanese, Russian, Italian, Portuguese, Korean, Arabic, Dutch, Polish, Swedish, Czech, Greek, Turkish, Ukrainian, Danish and Norwegian.
-
-### Author
-
-| Field | Type | Required | Description |
-| --- | --- | ---: | --- |
-| `fullName` | String | ✅ | Author's full name |
-| `nationality` | String | ❌ | Nationality |
-| `birthYear` | Number | ❌ | Year of birth |
-| `passingYear` | Number | ❌ | Year of death, when applicable |
-| `title` | String | ❌ | Chess title: `GM`, `IM`, `FM`, `CM` or `NM` |
-| `createdAt` | Date | — | Automatically generated timestamp |
-| `updatedAt` | Date | — | Automatically generated timestamp |
-
-### User
-
-| Field | Type | Required | Description |
-| --- | --- | ---: | --- |
-| `username` | String | ✅ | Display/login username |
-| `password` | String | ✅ | Stored as a bcrypt hash |
-| `email` | String | ✅ | Unique email address |
-| `role` | String | ✅ | `user` or `admin` |
-| `favorites` | `[ObjectId]` | ❌ | References to favourite `Book` documents |
-| `image.imgUrl` | String | ❌ | Cloudinary profile image URL |
-| `image.imgId` | String | ❌ | Cloudinary public ID |
-| `createdAt` | Date | — | Automatically generated timestamp |
-| `updatedAt` | Date | — | Automatically generated timestamp |
-
-### Relationships
-
-```text
-Author 1 ────────< Book >──────── 1 Author
-                       
-User 1 ────────< Favorite >────── Book
-```
-
-In MongoDB, books store references to authors and users store references to favourite books. Mongoose `populate()` is used to resolve these references in several read operations.
-
----
-
-## 🔐 Authentication & Authorization
-
-Authentication is implemented with **JWT**.
-
-### Login flow
-
-```text
-1. Client registers a user
-2. Client sends email + password to /api/users/login
-3. API verifies the password with bcrypt
-4. API signs a JWT using JWT_SECRET
-5. Client sends the token in future protected requests
-```
-
-Protected routes expect the token in the `Authorization` header:
-
-```http
-Authorization: Bearer <JWT_TOKEN>
-```
-
-The JWT payload currently contains the authenticated user's ID and email and expires after **1 day**.
-
-### Roles
-
-Two application roles are defined:
-
-- `user`
-- `admin`
-
-Administrative book operations and administrative user operations are protected with the authentication middleware and require the `admin` role.
-
----
-
-## 📡 API Reference
-
-Base URL for local development:
-
-```text
-http://localhost:3000
-```
-
-### Books
-
-| Method | Endpoint | Auth | Description |
-| --- | --- | --- | --- |
-| `GET` | `/api/books` | Public | Get all books |
-| `GET` | `/api/books/:id` | Public | Get a book by MongoDB ID |
-| `GET` | `/api/books/filterTitle?title=...` | Public | Search books by title fragment |
-| `GET` | `/api/books/filterLanguage?language=...` | Public | Filter books by language |
-| `GET` | `/api/books/filterAuthor?author=...` | Public | Filter books by author |
-| `GET` | `/api/books/yearRange?minYear=...&maxYear=...` | Public | Filter books by publication-year range |
-| `POST` | `/api/books` | Admin | Create a book |
-| `PUT` | `/api/books/:id` | Admin | Update a book |
-| `PATCH` | `/api/books/addAuthor/:id` | Admin | Add an author reference to a book |
-| `DELETE` | `/api/books/:id` | Admin | Delete a book |
-
-#### Example: search by title
-
-```http
-GET /api/books/filterTitle?title=system
-```
-
-The title search is case-insensitive and supports partial matches.
-
-#### Example: filter by language
-
-```http
-GET /api/books/filterLanguage?language=english
-```
-
-#### Example: filter by year range
-
-```http
-GET /api/books/yearRange?minYear=1900&maxYear=2000
-```
-
-The API defaults to `1400` and `2100` when the corresponding year values are omitted or empty.
-
-#### Create a book
-
-Book creation accepts `multipart/form-data` because a cover image can be uploaded using the `img` field.
-
-Example textual fields:
-
-```text
-title=My Chess Book
-synopsis=An example chess book
-...
-year=2025
-language=English
-publisher=Example Publisher
-```
-
-For the `authors` property, send the corresponding MongoDB `ObjectId` reference(s).
-
-#### Add an author to a book
-
-```http
-PATCH /api/books/addAuthor/:id
-Authorization: Bearer <JWT_TOKEN>
-Content-Type: application/json
-```
-
-Request body:
-
-```json
-{
-  "addAuthor": "AUTHOR_OBJECT_ID"
-}
-```
-
----
-
-### Authors
-
-| Method | Endpoint | Auth | Description |
-| --- | --- | --- | --- |
-| `GET` | `/api/authors` | Public | Get all authors |
-| `GET` | `/api/authors/:id` | Public | Get an author by ID |
-| `GET` | `/api/authors/name?name=...` | Public | Search authors by name fragment |
-| `POST` | `/api/authors` | Admin | Create an author |
-| `PUT` | `/api/authors/:id` | Admin | Update an author |
-| `DELETE` | `/api/authors/:id` | Admin | Delete an author |
-
-#### Example: search authors
-
-```http
-GET /api/authors/name?name=kasparov
-```
-
-The search is case-insensitive and matches fragments of `fullName`.
-
----
-
-### Users
-
-| Method | Endpoint | Auth | Description |
-| --- | --- | --- | --- |
-| `POST` | `/api/users/register` | Public | Register a new user |
-| `POST` | `/api/users/login` | Public | Authenticate a user and receive a JWT |
-| `PUT` | `/api/users/update/:id` | Public in current implementation | Update user information/profile image |
-| `GET` | `/api/users` | Admin | Get all users |
-| `GET` | `/api/users/:id` | Admin | Get a user by ID |
-| `DELETE` | `/api/users/delete/:id` | Admin | Delete a user |
-
-#### Register
-
-```http
-POST /api/users/register
-Content-Type: application/json
-```
-
-Example request:
-
-```json
-{
-  "username": "chessplayer",
-  "email": "chessplayer@example.com",
-  "password": "securepassword",
-  "role": "user"
-}
-```
-
-The API checks whether the email or username is already registered before creating the user.
-
-#### Login
-
-```http
-POST /api/users/login
-Content-Type: application/json
-```
-
-Example request:
-
-```json
-{
-  "email": "chessplayer@example.com",
-  "password": "securepassword"
-}
-```
-
-The response contains the generated JWT token.
-
-#### Update profile
-
-The update endpoint accepts `multipart/form-data` so that a profile image can be uploaded through the `img` field.
-
----
-
-## 🖼️ Image Uploads
-
-Images are handled with **Multer** and stored in **Cloudinary**.
-
-Two Cloudinary folders are configured:
-
-```text
-ChessBooks/books
-ChessBooks/users
-```
-
-Supported image formats:
-
-```text
-jpg
-png
-jpeg
-gif
-webp
-```
-
-The database stores both the Cloudinary URL and the Cloudinary public ID so that uploaded images can also be removed when the related resource is deleted.
-
----
-
-## ⚙️ Environment Variables
-
-Create a `.env` file in the project root.
-
-```env
-DB_URL=mongodb_connection_string
-JWT_SECRET=your_jwt_secret
-CLOUDINARY_CLOUD_NAME=your_cloudinary_cloud_name
-CLOUDINARY_API_KEY=your_cloudinary_api_key
-CLOUDINARY_API_SECRET=your_cloudinary_api_secret
-```
-
-### Variable reference
-
-| Variable | Purpose |
-| --- | --- |
-| `DB_URL` | MongoDB connection string |
-| `JWT_SECRET` | Secret used to sign and verify JWTs |
-| `CLOUDINARY_CLOUD_NAME` | Cloudinary cloud name |
-| `CLOUDINARY_API_KEY` | Cloudinary API key |
-| `CLOUDINARY_API_SECRET` | Cloudinary API secret |
-
-> **Important:** `.env` is ignored by Git through `.gitignore`. Never commit real database credentials, JWT secrets or Cloudinary credentials to the repository.
-
----
-
-## 🚀 Installation
-
-### 1. Clone the repository
+### 1. Clonar el repositorio
 
 ```bash
 git clone https://github.com/PacoCanovaca/ChessBooksAPI.git
 cd ChessBooksAPI
 ```
 
-### 2. Install dependencies
+### 2. Instalar las dependencias
 
 ```bash
 npm install
 ```
 
-### 3. Configure environment variables
+### 3. Configurar las variables de entorno
 
-Create `.env` and add the required values described above.
+Crear un archivo `.env` en la raíz del proyecto con las variables indicadas en el apartado [Configuración del Entorno](#️-configuración-del-entorno).
 
-### 4. Start the API
+### 4. Arrancar la API
 
-Development mode with Nodemon:
+En modo desarrollo, con reinicio automático al detectar cambios:
 
 ```bash
 npm run dev
 ```
 
-Production-style start command:
+Para ejecutar la aplicación en modo normal:
 
 ```bash
 npm start
 ```
 
-The application listens on:
+La API está configurada para escuchar en:
 
 ```text
 http://localhost:3000
 ```
 
----
+> **Notas sobre el estado actual del repositorio:**
+>
+> - Antes de poder arrancar la aplicación, hay que corregir `src/api/routes/authors.routes.js`: utiliza `isAuth` en las rutas de administración, pero no importa ese middleware. Como el router se carga desde `index.js`, esta referencia impide iniciar el servidor.
+> - Conviene revisar el middleware `pre("save")` de `src/api/models/user.model.js`: contiene la referencia `next` pero no invoca la función, por lo que el registro puede quedar bloqueado.
+> - `GET /api/users/:id` todavía necesita correcciones: el controlador no pasa el ID a `findById()` ni devuelve el usuario encontrado.
 
-## 🌱 Seed Data
+## ⚙️ Configuración del Entorno
 
-The repository contains sample data for chess authors and books.
+La aplicación carga las variables de entorno mediante `dotenv` desde el archivo `.env` situado en la raíz del repositorio.
 
-Run:
+| Variable | Descripción |
+|---|---|
+| `DB_URL` | Cadena de conexión a MongoDB. |
+| `JWT_SECRET` | Clave privada utilizada para firmar y verificar los tokens JWT. |
+| `CLOUDINARY_CLOUD_NAME` | Nombre del espacio de Cloudinary. |
+| `CLOUDINARY_API_KEY` | Clave de API de Cloudinary. |
+| `CLOUDINARY_API_SECRET` | Secreto de API de Cloudinary. |
+
+Ejemplo de archivo `.env`:
+
+```env
+DB_URL=mongodb+srv://<usuario>:<password>@<cluster>/<database>
+JWT_SECRET=sustituye_este_valor_por_una_clave_segura
+
+CLOUDINARY_CLOUD_NAME=tu_cloud_name
+CLOUDINARY_API_KEY=tu_api_key
+CLOUDINARY_API_SECRET=tu_api_secret
+```
+
+Sustituye los valores de ejemplo por tus propias credenciales. **No incluyas el archivo `.env`, contraseñas, claves privadas ni secretos reales en el repositorio.** Comprueba que `.env` esté incluido en `.gitignore` antes de subir cambios.
+
+El puerto está definido directamente como `3000` en `index.js`; actualmente no se configura mediante una variable `PORT`.
+
+## 📂 Estructura del Proyecto
+
+```text
+ChessBooksAPI/
+├── src/
+│   ├── api/
+│   │   ├── controllers/       # Lógica de negocio y tratamiento de peticiones
+│   │   ├── models/            # Esquemas y modelos de Mongoose
+│   │   └── routes/            # Definición de endpoints
+│   ├── config/
+│   │   ├── cloudinary.js      # Configuración de Cloudinary
+│   │   └── db.js              # Conexión con MongoDB
+│   ├── data/                  # Datos de ejemplo para la semilla
+│   ├── middlewares/           # Autorización y subida de archivos
+│   └── utils/
+│       ├── seeds/             # Scripts para inicializar datos
+│       ├── cloudinary.js      # Operaciones auxiliares con imágenes
+│       └── token.js           # Generación y verificación de JWT
+├── index.js                   # Configuración y arranque del servidor
+├── package.json
+├── package-lock.json
+└── .gitignore
+```
+
+## 📡 Referencia de la API
+
+La API utiliza el prefijo `/api` y organiza sus recursos en tres grupos: libros, autores y usuarios. Las respuestas se devuelven en formato JSON, salvo las operaciones que reciben imágenes, que utilizan `multipart/form-data`.
+
+### Libros — `/api/books`
+
+| Método | Endpoint | Descripción | Acceso |
+|---|---|---|---|
+| `GET` | `/api/books` | Obtener el catálogo de libros. | Público |
+| `GET` | `/api/books/:id` | Obtener un libro por su ID. | Público |
+| `GET` | `/api/books/filterTitle?title={title}` | Buscar por título o fragmento del título. | Público |
+| `GET` | `/api/books/filterLanguage?language={language}` | Filtrar por idioma. | Público |
+| `GET` | `/api/books/filterAuthor?author={name}` | Filtrar por nombre de autor. | Público |
+| `GET` | `/api/books/yearRange?minYear={year}&maxYear={year}` | Filtrar por intervalo de publicación. | Público |
+| `POST` | `/api/books` | Crear un libro. Admite una imagen en el campo `img`. | Admin |
+| `PUT` | `/api/books/:id` | Actualizar un libro. Admite una imagen en el campo `img`. | Admin |
+| `DELETE` | `/api/books/:id` | Eliminar un libro. | Admin |
+| `PATCH` | `/api/books/addAuthor/:id` | Añadir un autor a un libro. | Admin |
+
+### Autores — `/api/authors`
+
+| Método | Endpoint | Descripción | Acceso |
+|---|---|---|---|
+| `GET` | `/api/authors` | Obtener todos los autores. | Público |
+| `GET` | `/api/authors/:id` | Obtener un autor por su ID. | Público |
+| `GET` | `/api/authors/name?name={name}` | Buscar autores por nombre. | Público |
+| `POST` | `/api/authors` | Crear un autor. | Admin |
+| `PUT` | `/api/authors/:id` | Actualizar un autor. | Admin |
+| `DELETE` | `/api/authors/:id` | Eliminar un autor. | Admin |
+
+### Usuarios — `/api/users`
+
+| Método | Endpoint | Descripción | Acceso |
+|---|---|---|---|
+| `POST` | `/api/users/register` | Registrar un usuario. | Público |
+| `POST` | `/api/users/login` | Iniciar sesión y obtener un JWT. | Público |
+| `PUT` | `/api/users/update/:id` | Actualizar datos del perfil. Admite una imagen en el campo `img`. | Público |
+| `DELETE` | `/api/users/delete/:id` | Eliminar un usuario. | Admin |
+| `GET` | `/api/users` | Obtener el listado de usuarios y sus favoritos. | Admin |
+| `GET` | `/api/users/:id` | Consultar un usuario por ID. | Admin |
+
+Para las rutas protegidas, el token debe enviarse en la cabecera HTTP:
+
+```http
+Authorization: Bearer <token>
+```
+
+## 🗄️ Modelo de Datos
+
+La base de datos se organiza alrededor de tres entidades principales:
+
+- **Book:** representa un libro de ajedrez e incluye sus datos bibliográficos, enlaces de compra e información de su imagen.
+- **Author:** almacena la información de los autores, como nombre, nacionalidad, fechas y título ajedrecístico.
+- **User:** representa a los usuarios de la plataforma, con sus credenciales, rol, imagen de perfil y libros favoritos.
+
+Las relaciones se implementan mediante referencias de MongoDB gestionadas por Mongoose. Un libro puede estar asociado a varios autores y un autor puede aparecer en distintos libros. Del mismo modo, un usuario puede guardar varios libros como favoritos y un mismo libro puede estar en las listas de favoritos de distintos usuarios.
+
+## 🔐 Autenticación y Roles
+
+La autenticación se basa en **JSON Web Tokens (JWT)**:
+
+1. El usuario se registra mediante `POST /api/users/register`.
+2. Para iniciar sesión, envía sus credenciales a `POST /api/users/login`.
+3. La API comprueba la contraseña almacenada mediante `bcrypt` y, si es válida, genera un token JWT.
+4. El token incluye el identificador y el correo del usuario y tiene una duración de **24 horas**.
+5. Para acceder a los endpoints protegidos, el cliente envía el token como `Bearer` en la cabecera `Authorization`.
+
+El modelo contempla dos roles:
+
+- **`user`:** usuario estándar.
+- **`admin`:** puede acceder a las operaciones administrativas protegidas por el middleware de autorización.
+
+**Consideración de seguridad:** el endpoint de registro utiliza los datos recibidos para crear el usuario y el modelo exige un rol. La asignación de roles privilegiados debe realizarse y validarse en el servidor, nunca confiarse al valor enviado por el cliente. Además, `PUT /api/users/update/:id` no aplica actualmente el middleware de autenticación, por lo que conviene protegerlo antes de utilizar la API en un entorno público.
+
+## 🧪 Scripts y Testing
+
+El proyecto incluye los siguientes scripts npm:
+
+| Comando | Descripción |
+|---|---|
+| `npm run dev` | Inicia el servidor con Nodemon. |
+| `npm start` | Inicia el servidor con Node.js. |
+| `npm run bookSeed` | Reinicializa los datos de autores y libros con los registros de ejemplo. |
+
+Para ejecutar la semilla:
 
 ```bash
 npm run bookSeed
 ```
 
-### ⚠️ Seed warning
+> **Advertencia:** el script de semilla elimina las colecciones de libros y autores cuando contienen datos y después inserta los registros de ejemplo. No lo ejecutes contra una base de datos con información que quieras conservar.
 
-The current seed script **drops the existing `books` and `authors` collections before inserting the seed data**. Do not execute it against a database containing data you need to preserve.
+No hay un script de pruebas automatizadas definido actualmente en `package.json`.
 
----
-
-## 🧪 Testing the API
-
-The project can be tested with tools such as **Insomnia**, **Postman** or `curl`.
-
-A typical authentication test flow is:
-
-```text
-Register user
-    ↓
-Login user
-    ↓
-Copy JWT
-    ↓
-Send Authorization: Bearer <token>
-    ↓
-Access protected admin endpoints with an admin account
-```
-
-For multipart requests such as book creation or profile updates, use `form-data` instead of a raw JSON body.
-
----
-
-## 🔒 Security Notes
-
-The project already incorporates several useful backend security mechanisms:
-
-- Passwords are hashed with `bcrypt` before persistence.
-- JWTs are signed with a secret stored in the environment.
-- Protected routes verify the JWT before checking the user's role.
-- User passwords are removed from `req.user` after authentication middleware loads the authenticated user.
-- Secrets and local environment configuration are excluded from Git.
-
-For production deployment, additional hardening would be appropriate, especially around input validation, rate limiting, CORS policy, error handling, authorization ownership checks and secret management.
-
----
-
-## ⚠️ Current Limitations / Technical Debt
-
-This repository is a learning/portfolio project and the current implementation still contains areas that should be addressed before production use.
-
-### Authors router
-
-The current `authors.routes.js` applies `isAuth(["admin"])` to write operations but does not import `isAuth`. This needs to be corrected before the application can reliably load the authors router.
-
-### User update authorization
-
-`PUT /api/users/update/:id` is not protected by the authentication middleware in the current route definition. A production implementation should authenticate the request and restrict users to their own profile unless they have an appropriate administrative role.
-
-### User lookup controller
-
-The current `getUserById` controller does not pass `req.params.id` to `User.findById()` and does not send the successful response. This endpoint needs correction before it can be considered complete.
-
-### Request validation
-
-Validation is currently handled mainly through Mongoose schemas and controller-level checks. A dedicated request-validation layer would make API validation and error responses more consistent.
-
-### Error-handling consistency
-
-Controllers currently implement their own `try/catch` blocks and response messages. A centralized error-handling middleware would reduce duplication and improve consistency.
-
-### Automated tests
-
-No automated test suite is currently included in the repository. Adding unit and integration tests would make refactoring safer and improve confidence in the API.
-
----
-
-## 🔮 Possible Future Improvements
-
-- Add automated unit and integration tests.
-- Add centralized error handling.
-- Add request validation with a dedicated validation library.
-- Add pagination and sorting to collection endpoints.
-- Add stricter ownership-based authorization for user resources.
-- Add dedicated endpoints for managing favourites.
-- Improve author/book relationship handling and deletion rules.
-- Add API documentation with OpenAPI/Swagger.
-- Add CORS and security-header configuration for deployment.
-- Add environment validation at application startup.
-- Add Docker support and a deployment configuration.
-- Add a frontend client consuming the REST API.
-- Add CI checks for linting, tests and dependency/security checks.
-
----
-
-## 📚 Example Resource
-
-A book document returned by the API can conceptually look like this:
-
-```json
-{
-  "_id": "BOOK_OBJECT_ID",
-  "title": "My System",
-  "synopsis": "A foundational work on chess strategy.",
-  "year": 1925,
-  "language": "English",
-  "authors": [
-    {
-      "_id": "AUTHOR_OBJECT_ID",
-      "fullName": "Aron Nimzowitsch",
-      "nationality": "Latvian"
-    }
-  ],
-  "purchase_links": [
-    "https://example.com/buy/my-system"
-  ],
-  "image": {
-    "imgUrl": "https://res.cloudinary.com/...",
-    "imgId": "ChessBooks/books/..."
-  },
-  "publisher": "Quality Chess",
-  "createdAt": "2026-01-01T00:00:00.000Z",
-  "updatedAt": "2026-01-01T00:00:00.000Z"
-}
-```
-
----
-
-## 📄 License
-
-This project declares the **ISC** license in `package.json`.
-
----
-
-## 👨‍💻 Author
+## 👨‍💻 Autor y Licencia
 
 **Paco Canovaca**
 
-GitHub: [@PacoCanovaca](https://github.com/PacoCanovaca)
+- **GitHub:** [PacoCanovaca](https://github.com/PacoCanovaca)
+- **LinkedIn:** [Perfil profesional](https://www.linkedin.com/in/francisco-jos%C3%A9-canovaca-c%C3%A1rdenas-65a51a1aa/)
+- **Email:** [pacocanovaca97@gmail.com](mailto:pacocanovaca97@gmail.com)
 
-Repository: [ChessBooksAPI](https://github.com/PacoCanovaca/ChessBooksAPI)
+**Licencia:** [ISC](https://opensource.org/licenses/ISC)
